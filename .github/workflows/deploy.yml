@@ -18,4 +18,4 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push https://karlchee:$HF_TOKEN@huggingface.co/spaces/karlchee/Financial_Stress_Test main
+          git push https://karlchee:$HF_TOKEN@huggingface.co/spaces/karlchee/Financial_Stress_Test main:main
