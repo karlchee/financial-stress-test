@@ -1,0 +1,109 @@
+{
+  "_note": "Curated historical macro events with approximate realized 3-month factor moves. Used as few-shot reasoning anchors in LLM prompting. Values are approximate, sourced from public market data, and intended as directional reference points — not precise historical claims. Pre-1993 events have null VIX (index didn't exist yet); pre-2003 events have null breakeven (TIPS market was thin).",
+  "horizon": "3 months",
+  "factor_units": {
+    "returns": "decimal (mkt_excess, smb, hml, mom, oil, dxy)",
+    "bps_changes": "basis points (ust10y, slope, breakeven, ig_spread, hy_spread)",
+    "points": "VIX points (vix)"
+  },
+  "events": [
+    {
+      "id": "iraq_kuwait_1990",
+      "name": "Iraq invades Kuwait",
+      "date": "1990-08-02",
+      "horizon_window": "1990-08 to 1990-10",
+      "summary": "Iraq's invasion of Kuwait triggered an oil price spike and equity drawdown amid recession fears. Inflation concerns kept long rates elevated despite slowing growth.",
+      "shocks": {
+        "mkt_excess": -0.15, "smb": -0.04, "hml": 0.02, "mom": 0.05,
+        "oil": 0.55, "dxy": -0.04,
+        "ust10y": 30, "slope": -10, "breakeven": null,
+        "ig_spread": 60, "hy_spread": 250, "vix": null
+      },
+      "lessons": "Geopolitical oil shock + recession: equities fall, oil rallies hard, credit widens, USD softer (Fed easing). Pre-VIX/breakeven era — those values null."
+    },
+    {
+      "id": "sept_11_2001",
+      "name": "9/11 attacks",
+      "date": "2001-09-11",
+      "horizon_window": "2001-09 to 2001-12",
+      "summary": "Terror attacks shut markets briefly and crystallized recession. Fed cut aggressively. Flight to quality drove rates lower despite credit widening.",
+      "shocks": {
+        "mkt_excess": -0.06, "smb": 0.03, "hml": 0.04, "mom": -0.02,
+        "oil": -0.20, "dxy": -0.03,
+        "ust10y": -100, "slope": 50, "breakeven": null,
+        "ig_spread": 40, "hy_spread": 200, "vix": 10
+      },
+      "lessons": "Risk-off + dovish policy pivot: rates fall sharply, oil weak (demand fears), small caps and value outperform on stimulus expectations. Curve steepens."
+    },
+    {
+      "id": "lehman_2008",
+      "name": "Lehman Brothers / GFC peak",
+      "date": "2008-09-15",
+      "horizon_window": "2008-09 to 2008-12",
+      "summary": "Lehman bankruptcy triggered systemic credit freeze. Aggressive Fed response, flight to USD and Treasuries, oil collapse on demand destruction.",
+      "shocks": {
+        "mkt_excess": -0.27, "smb": -0.04, "hml": -0.02, "mom": 0.10,
+        "oil": -0.55, "dxy": 0.10,
+        "ust10y": -130, "slope": 50, "breakeven": -200,
+        "ig_spread": 300, "hy_spread": 800, "vix": 50
+      },
+      "lessons": "Maximum systemic stress: everything correlates, USD rallies, credit blows out, oil crashes on demand collapse. Momentum (short losers) wins big in cross-section."
+    },
+    {
+      "id": "eurozone_2011",
+      "name": "Eurozone sovereign crisis / US downgrade",
+      "date": "2011-08-05",
+      "horizon_window": "2011-08 to 2011-10",
+      "summary": "S&P downgrades US sovereign rating; peripheral Europe debt fears intensify. Risk-off, flight to quality (UST despite downgrade), VIX spike.",
+      "shocks": {
+        "mkt_excess": -0.10, "smb": -0.05, "hml": -0.02, "mom": 0.04,
+        "oil": -0.05, "dxy": 0.05,
+        "ust10y": -70, "slope": -20, "breakeven": -40,
+        "ig_spread": 60, "hy_spread": 250, "vix": 18
+      },
+      "lessons": "Sovereign risk + USD strength + flight to UST. Pattern resembles a milder Lehman; small caps lag."
+    },
+    {
+      "id": "covid_2020",
+      "name": "COVID-19 pandemic onset",
+      "date": "2020-02-20",
+      "horizon_window": "2020-02 to 2020-05",
+      "summary": "Pandemic lockdowns triggered fastest equity drawdown in history. Oil briefly went negative. Massive Fed/fiscal response. Huge cross-sectional dispersion.",
+      "shocks": {
+        "mkt_excess": -0.10, "smb": -0.10, "hml": -0.15, "mom": 0.20,
+        "oil": -0.55, "dxy": 0.02,
+        "ust10y": -90, "slope": -10, "breakeven": -60,
+        "ig_spread": 200, "hy_spread": 600, "vix": 25
+      },
+      "lessons": "Rapid demand shock with massive policy offset. Growth/momentum dominated; value collapsed (energy/financials hit hardest). Oil shock as severe as GFC. Note: 3M cumulative includes the rebound from late-March lows."
+    },
+    {
+      "id": "russia_ukraine_2022",
+      "name": "Russia invades Ukraine",
+      "date": "2022-02-24",
+      "horizon_window": "2022-02 to 2022-05",
+      "summary": "Energy supply shock layered onto already-elevated inflation. Fed accelerated hiking. Equities sold off, value/energy outperformed, USD rallied.",
+      "shocks": {
+        "mkt_excess": -0.10, "smb": -0.03, "hml": 0.10, "mom": 0.06,
+        "oil": 0.15, "dxy": 0.06,
+        "ust10y": 100, "slope": -30, "breakeven": 30,
+        "ig_spread": 30, "hy_spread": 120, "vix": 8
+      },
+      "lessons": "Stagflationary shock: oil up, rates up, equities down. Value > Growth. Curve flattened on hiking expectations. Modest credit widening."
+    },
+    {
+      "id": "svb_2023",
+      "name": "Silicon Valley Bank failure",
+      "date": "2023-03-10",
+      "horizon_window": "2023-03 to 2023-06",
+      "summary": "Regional bank failures triggered banking-stress flight to quality. Fed pivoted to more cautious tightening. Mega-cap tech rallied on AI optimism.",
+      "shocks": {
+        "mkt_excess": 0.05, "smb": -0.04, "hml": -0.06, "mom": 0.04,
+        "oil": -0.10, "dxy": -0.03,
+        "ust10y": -40, "slope": 20, "breakeven": -10,
+        "ig_spread": 15, "hy_spread": 60, "vix": -2
+      },
+      "lessons": "Sector-specific stress, broad indices held up via mega-cap tech. Regional banks crushed; large caps positive. Rates rallied on policy pivot expectations. Interesting case where headline stress did NOT translate to broad-market drawdown."
+    }
+  ]
+}

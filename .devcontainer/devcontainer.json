@@ -1,0 +1,42 @@
+{
+  "name": "Financial Stress Test",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "forwardPorts": [8501],
+  "portsAttributes": {
+    "8501": {
+      "label": "Streamlit",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+  "secrets": {
+    "GEMINI_API_KEY": {
+      "description": "Google AI Studio API key for Gemini (free tier)",
+      "documentationUrl": "https://aistudio.google.com/app/apikey"
+    },
+    "ANTHROPIC_API_KEY": {
+      "description": "Optional: Anthropic API key for Claude Sonnet 4.6 (paid)",
+      "documentationUrl": "https://console.anthropic.com"
+    },
+    "GROQ_API_KEY": {
+      "description": "Optional: Groq API key for fast Llama inference (free tier)",
+      "documentationUrl": "https://console.groq.com"
+    }
+  }
+}
