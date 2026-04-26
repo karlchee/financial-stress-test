@@ -145,7 +145,18 @@ def _on_user_message(text: str) -> None:
                     new_shocks[k] = float(v)
                 except (TypeError, ValueError):
                     pass
+        # Update both the canonical state and each widget key so the
+        # shocks panel reflects the LLM's proposal on the next rerun.
+        # (Streamlit number_input widgets use their key as source of truth
+        # after first render, so the canonical dict alone isn't enough.)
         ss["shocks"] = new_shocks
+        for fname, val in new_shocks.items():
+            ss[f"shock_{fname}"] = val
+        # Show a small confirmation in the chat that the panel was updated.
+        ss["messages"].append({
+            "role": "assistant",
+            "content": "_Shocks panel updated — review and edit, then click **Run model**._",
+        })
 
 
 def _on_run() -> None:
@@ -175,6 +186,9 @@ def _on_reset() -> None:
     ss["summary"] = None
     ss["nearest"] = []
     ss["curated_match"] = []
+    # Clear the widget-keyed shock values too so the panel resets visually.
+    for fname in FACTOR_NAMES:
+        ss[f"shock_{fname}"] = 0.0
 
 
 # ---- Layout ----
