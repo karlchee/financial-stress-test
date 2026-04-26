@@ -86,20 +86,6 @@ FACTORS: list[Factor] = [
         typical_3m_range=(-80, 80),
     ),
     Factor(
-        name="ig_spread",
-        description="ICE BofA US Investment Grade corporate OAS change over 3 months",
-        unit="basis points",
-        direction="change",
-        typical_3m_range=(-50, 250),
-    ),
-    Factor(
-        name="hy_spread",
-        description="ICE BofA US High Yield corporate OAS change over 3 months",
-        unit="basis points",
-        direction="change",
-        typical_3m_range=(-200, 700),
-    ),
-    Factor(
         name="vix",
         description="VIX index level change over 3 months",
         unit="points (e.g. 10 means +10 vol points)",

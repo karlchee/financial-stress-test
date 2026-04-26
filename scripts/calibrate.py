@@ -50,8 +50,6 @@ FRED_SERIES = {
     "ust10y":       "DGS10",          # 10Y Treasury constant maturity, 1962-
     "ust2y":        "DGS2",           # 2Y Treasury constant maturity, 1976-
     "breakeven10y": "T10YIE",         # 10Y breakeven inflation, 2003-
-    "ig_spread":    "BAMLC0A0CM",     # ICE BofA US IG OAS, 1996-
-    "hy_spread":    "BAMLH0A0HYM2",   # ICE BofA US HY OAS, 1996-
     "vix":          "VIXCLS",         # VIX close, 1990-
 }
 
@@ -68,8 +66,6 @@ LONG_FRED_SERIES = {
     "ust10y":       "DGS10",
     "ust2y":        "DGS2",
     "breakeven10y": "T10YIE",
-    "ig_spread":    "BAMLC0A0CM",
-    "hy_spread":    "BAMLH0A0HYM2",
     "vix":          "VIXCLS",
 }
 
@@ -93,8 +89,16 @@ def load_sp500_tickers() -> pd.DataFrame:
     Returns columns: ticker, name, sector. Tickers use Yahoo's '-' convention
     (e.g. 'BRK-B' rather than 'BRK.B').
     """
+    import requests
+    from io import StringIO
+    
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    tables = pd.read_html(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
+    tables = pd.read_html(StringIO(response.text))
     df = tables[0].rename(columns={
         "Symbol": "ticker",
         "Security": "name",
@@ -187,21 +191,25 @@ def build_monthly_factors(fred_d: pd.DataFrame, french: pd.DataFrame,
     """
     fred_m = fred_d.resample("MS").last().ffill()
     fred_m.index = _to_month_start(fred_m.index)
+    
+    # Convert French PeriodIndex to DatetimeIndex for alignment
+    french_ts = french.copy()
+    if hasattr(french_ts.index, 'to_timestamp'):
+        french_ts.index = _to_month_start(french_ts.index.to_timestamp(how="start"))
+    french_ts = french_ts.reindex(fred_m.index)
 
     f = pd.DataFrame(index=fred_m.index)
-    f["oil"]       = fred_m["oil_wti"].pct_change(fill_method=None)
-    f["dxy"]       = fred_m["dxy"].pct_change(fill_method=None)
+    f["oil"]       = fred_m["oil_wti"].pct_change()
+    f["dxy"]       = fred_m["dxy"].pct_change()
     f["ust10y"]    = fred_m["ust10y"].diff() * 100        # percent -> bps
     f["slope"]     = (fred_m["ust10y"] - fred_m["ust2y"]).diff() * 100
     f["breakeven"] = fred_m["breakeven10y"].diff() * 100
-    f["ig_spread"] = fred_m["ig_spread"].diff() * 100
-    f["hy_spread"] = fred_m["hy_spread"].diff() * 100
     f["vix"]       = fred_m["vix"].diff()                  # already in points
 
     # Style factors from Ken French (already monthly, decimal)
     for c in ("smb", "hml", "mom"):
-        f[c] = french[c]
-    rf = french["rf"]
+        f[c] = french_ts[c]
+    rf = french_ts["rf"]
 
     # Market excess: SP500 monthly return - RF
     sp_ret = sp500_m.pct_change()
@@ -242,8 +250,8 @@ def splice_returns(primary: pd.Series, secondary: pd.Series) -> pd.Series:
     to secondary's pct_change. This avoids constructing a spurious return at
     the splice point (which would compare two different price levels).
     """
-    primary_ret = primary.pct_change(fill_method=None)
-    secondary_ret = secondary.pct_change(fill_method=None)
+    primary_ret = primary.pct_change()
+    secondary_ret = secondary.pct_change()
     return primary_ret.where(primary_ret.notna(), secondary_ret)
 
 
@@ -261,6 +269,12 @@ def build_long_monthly_factors(fred_d: pd.DataFrame, french: pd.DataFrame,
     """
     fred_m = fred_d.resample("MS").last()
     fred_m.index = _to_month_start(fred_m.index)
+    
+    # Convert French PeriodIndex to DatetimeIndex for alignment
+    french_ts = french.copy()
+    if hasattr(french_ts.index, 'to_timestamp'):
+        french_ts.index = _to_month_start(french_ts.index.to_timestamp(how="start"))
+    french_ts = french_ts.reindex(fred_m.index)
 
     f = pd.DataFrame(index=fred_m.index)
 
@@ -272,18 +286,16 @@ def build_long_monthly_factors(fred_d: pd.DataFrame, french: pd.DataFrame,
     f["ust10y"]    = fred_m["ust10y"].diff() * 100
     f["slope"]     = (fred_m["ust10y"] - fred_m["ust2y"]).diff() * 100
     f["breakeven"] = fred_m["breakeven10y"].diff() * 100
-    f["ig_spread"] = fred_m["ig_spread"].diff() * 100
-    f["hy_spread"] = fred_m["hy_spread"].diff() * 100
     f["vix"]       = fred_m["vix"].diff()
 
     # Style factors from Ken French (back to 1926, no nulls)
     for c in ("smb", "hml", "mom"):
-        f[c] = french[c]
+        f[c] = french_ts[c]
 
     # Market excess: SP500 monthly return - RF
     sp_ret = sp500_m.pct_change()
     sp_ret = sp_ret.reindex(f.index)
-    rf_aligned = french["rf"].reindex(f.index)
+    rf_aligned = french_ts["rf"].reindex(f.index)
     f["mkt_excess"] = sp_ret - rf_aligned
 
     return f[FACTOR_NAMES]
@@ -306,7 +318,7 @@ def build_long_history_dataset(end: pd.Timestamp,
     long_factors_m = build_long_monthly_factors(long_fred, long_french, long_sp500)
 
     return_cols = ["mkt_excess", "smb", "hml", "mom", "oil", "dxy"]
-    change_cols = ["ust10y", "slope", "breakeven", "ig_spread", "hy_spread", "vix"]
+    change_cols = ["ust10y", "slope", "breakeven", "vix"]
     long_factor_3m = aggregate_3m_overlap(long_factors_m, return_cols, change_cols)
 
     out_path = output_dir / "factor_history.parquet"
@@ -322,13 +334,48 @@ def fit_per_stock(stock_y: pd.DataFrame, factor_X: pd.DataFrame,
 
     Columns: ticker, alpha, n_obs, r2, beta_<factor> for each factor.
     Stocks with fewer than `min_obs` aligned observations are skipped.
+    
+    Handles missing data intelligently:
+      - Always drops rows where stock y is NaN
+      - Always drops rows where core factors (mkt_excess, smb, hml, mom, oil, dxy) are NaN
+      - For optional factors with significant gaps (if >50% missing),
+        drops sparse factor columns entirely rather than dropping rows
+      - Fills remaining NaN in non-core factors with forward-fill
     """
+    # Core factors that must be non-null (foundational market + style factors plus commodities)
+    core_factors = ["mkt_excess", "smb", "hml", "mom", "oil", "dxy"]
+    
+    # Optional factors that may be sparse (credit spreads especially)
+    optional_factors = ["ust10y", "slope", "breakeven", "vix"]
+    
     rows = []
     for ticker in stock_y.columns:
-        df = pd.concat([stock_y[ticker].rename("y"), factor_X], axis=1).dropna()
+        df = pd.concat([stock_y[ticker].rename("y"), factor_X], axis=1)
+        
+        # Drop rows where stock y or core factors are NaN
+        df = df.dropna(subset=["y"] + core_factors)
+        
+        # Check which optional factors have too many missing values (>50%)
+        factors_to_use = core_factors.copy()
+        for opt_factor in optional_factors:
+            if opt_factor in df.columns:
+                nan_ratio = df[opt_factor].isna().sum() / len(df)
+                if nan_ratio < 0.5:
+                    # This factor has <50% missing, include it
+                    factors_to_use.append(opt_factor)
+        
+        # Forward-fill remaining NaN in factors we're using
+        for f in factors_to_use:
+            if f in df.columns and f not in core_factors:
+                df[f] = df[f].ffill()
+        
+        # Drop any remaining NaN rows (shouldn't be many after ffill)
+        df = df.dropna(subset=["y"] + factors_to_use)
+        
         if len(df) < min_obs:
             continue
-        X = df[FACTOR_NAMES].values
+        
+        X = df[factors_to_use].values
         y = df["y"].values
         m = Ridge(alpha=alpha, fit_intercept=True)
         m.fit(X, y)
@@ -342,8 +389,13 @@ def fit_per_stock(stock_y: pd.DataFrame, factor_X: pd.DataFrame,
             "n_obs":  int(len(df)),
             "r2":     float(r2),
         }
-        for fname, beta in zip(FACTOR_NAMES, m.coef_):
-            row[f"beta_{fname}"] = float(beta)
+        # Record betas for all FACTOR_NAMES (use NaN for factors not in the model)
+        factor_idx = {f: i for i, f in enumerate(factors_to_use)}
+        for fname in FACTOR_NAMES:
+            if fname in factor_idx:
+                row[f"beta_{fname}"] = float(m.coef_[factor_idx[fname]])
+            else:
+                row[f"beta_{fname}"] = float("nan")
         rows.append(row)
     return pd.DataFrame(rows)
 
@@ -485,7 +537,7 @@ def main() -> int:
 
     print(f"[5/7] Aggregating to 3M overlapping windows...")
     return_cols = ["mkt_excess", "smb", "hml", "mom", "oil", "dxy"]
-    change_cols = ["ust10y", "slope", "breakeven", "ig_spread", "hy_spread", "vix"]
+    change_cols = ["ust10y", "slope", "breakeven", "vix"]
     factor_3m = aggregate_3m_overlap(factors_m, return_cols, change_cols)
     rf_3m = (1 + factors_m["rf"]).rolling(3).apply(np.prod, raw=True) - 1
     stock_3m = (1 + rets).rolling(3).apply(np.prod, raw=True) - 1

@@ -3,7 +3,7 @@
   "horizon": "3 months",
   "factor_units": {
     "returns": "decimal (mkt_excess, smb, hml, mom, oil, dxy)",
-    "bps_changes": "basis points (ust10y, slope, breakeven, ig_spread, hy_spread)",
+    "bps_changes": "basis points (ust10y, slope, breakeven)",
     "points": "VIX points (vix)"
   },
   "events": [
@@ -17,7 +17,7 @@
         "mkt_excess": -0.15, "smb": -0.04, "hml": 0.02, "mom": 0.05,
         "oil": 0.55, "dxy": -0.04,
         "ust10y": 30, "slope": -10, "breakeven": null,
-        "ig_spread": 60, "hy_spread": 250, "vix": null
+        "vix": null
       },
       "lessons": "Geopolitical oil shock + recession: equities fall, oil rallies hard, credit widens, USD softer (Fed easing). Pre-VIX/breakeven era — those values null."
     },
@@ -31,7 +31,7 @@
         "mkt_excess": -0.06, "smb": 0.03, "hml": 0.04, "mom": -0.02,
         "oil": -0.20, "dxy": -0.03,
         "ust10y": -100, "slope": 50, "breakeven": null,
-        "ig_spread": 40, "hy_spread": 200, "vix": 10
+        "vix": 10
       },
       "lessons": "Risk-off + dovish policy pivot: rates fall sharply, oil weak (demand fears), small caps and value outperform on stimulus expectations. Curve steepens."
     },
@@ -45,7 +45,7 @@
         "mkt_excess": -0.27, "smb": -0.04, "hml": -0.02, "mom": 0.10,
         "oil": -0.55, "dxy": 0.10,
         "ust10y": -130, "slope": 50, "breakeven": -200,
-        "ig_spread": 300, "hy_spread": 800, "vix": 50
+        "vix": 50
       },
       "lessons": "Maximum systemic stress: everything correlates, USD rallies, credit blows out, oil crashes on demand collapse. Momentum (short losers) wins big in cross-section."
     },
@@ -59,7 +59,7 @@
         "mkt_excess": -0.10, "smb": -0.05, "hml": -0.02, "mom": 0.04,
         "oil": -0.05, "dxy": 0.05,
         "ust10y": -70, "slope": -20, "breakeven": -40,
-        "ig_spread": 60, "hy_spread": 250, "vix": 18
+        "vix": 18
       },
       "lessons": "Sovereign risk + USD strength + flight to UST. Pattern resembles a milder Lehman; small caps lag."
     },
@@ -73,7 +73,7 @@
         "mkt_excess": -0.10, "smb": -0.10, "hml": -0.15, "mom": 0.20,
         "oil": -0.55, "dxy": 0.02,
         "ust10y": -90, "slope": -10, "breakeven": -60,
-        "ig_spread": 200, "hy_spread": 600, "vix": 25
+        "vix": 25
       },
       "lessons": "Rapid demand shock with massive policy offset. Growth/momentum dominated; value collapsed (energy/financials hit hardest). Oil shock as severe as GFC. Note: 3M cumulative includes the rebound from late-March lows."
     },
@@ -87,7 +87,7 @@
         "mkt_excess": -0.10, "smb": -0.03, "hml": 0.10, "mom": 0.06,
         "oil": 0.15, "dxy": 0.06,
         "ust10y": 100, "slope": -30, "breakeven": 30,
-        "ig_spread": 30, "hy_spread": 120, "vix": 8
+        "vix": 8
       },
       "lessons": "Stagflationary shock: oil up, rates up, equities down. Value > Growth. Curve flattened on hiking expectations. Modest credit widening."
     },
@@ -101,7 +101,7 @@
         "mkt_excess": 0.05, "smb": -0.04, "hml": -0.06, "mom": 0.04,
         "oil": -0.10, "dxy": -0.03,
         "ust10y": -40, "slope": 20, "breakeven": -10,
-        "ig_spread": 15, "hy_spread": 60, "vix": -2
+        "vix": -2
       },
       "lessons": "Sector-specific stress, broad indices held up via mega-cap tech. Regional banks crushed; large caps positive. Rates rallied on policy pivot expectations. Interesting case where headline stress did NOT translate to broad-market drawdown."
     }
