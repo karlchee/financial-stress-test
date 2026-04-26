@@ -30,14 +30,14 @@ def chat_panel(messages: list[dict],
                send_callback: Callable[[str], None]) -> None:
     """Render chat history and a send box."""
     st.subheader("Scenario advisor")
-    container = st.container(height=400)
+    user_input = st.chat_input("Describe a scenario...")
+    if user_input:
+        send_callback(user_input)
+    container = st.container(height=400, key="chat_container")
     with container:
         for m in messages:
             with st.chat_message(m["role"]):
                 st.markdown(m["content"])
-    user_input = st.chat_input("Describe a scenario...")
-    if user_input:
-        send_callback(user_input)
 
 
 def shocks_panel(shocks: dict[str, float],
