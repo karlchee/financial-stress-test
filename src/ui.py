@@ -44,24 +44,36 @@ def shocks_panel(shocks: dict[str, float],
                  on_change: Callable[[dict[str, float]], None]) -> dict[str, float]:
     """Editable shocks panel.
 
-    Renders one number input per factor with unit/range hints. Returns the
-    (possibly edited) shocks dict; calls `on_change` if any field differs
-    from the input.
+    Renders one number input per factor with unit/range hints. The widget
+    keys (``shock_<fname>``) are the source of truth for what's displayed.
+    Callers (e.g. the LLM tool-call handler) should write directly to those
+    keys to update the displayed values; we then mirror them back into the
+    canonical ``shocks`` dict via ``on_change``.
     """
     st.subheader("Factor shocks (3-month)")
-    edited: dict[str, float] = {}
+
+    # Initialize widget state from the canonical shocks dict on first render.
+    # Streamlit uses the widget key as source of truth on subsequent reruns,
+    # so we must seed it here rather than via st.number_input(value=...).
+    for fname in FACTOR_NAMES:
+        wk = f"shock_{fname}"
+        if wk not in st.session_state:
+            st.session_state[wk] = float(shocks.get(fname, 0.0))
+
     cols = st.columns(2)
     for i, fname in enumerate(FACTOR_NAMES):
         f = FACTORS_BY_NAME[fname]
         col = cols[i % 2]
         with col:
-            edited[fname] = st.number_input(
+            st.number_input(
                 fname,
-                value=float(shocks.get(fname, 0.0)),
                 help=f"{f.description}\nUnit: {f.unit}\nTypical 3M: {f.typical_3m_range}",
                 key=f"shock_{fname}",
                 format=_factor_format(fname),
             )
+
+    edited = {fname: float(st.session_state[f"shock_{fname}"])
+              for fname in FACTOR_NAMES}
     if edited != shocks:
         on_change(edited)
     return edited
