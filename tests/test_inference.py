@@ -98,10 +98,11 @@ def test_curated_analogs_returns_k_sorted():
 def test_lehman_matches_severe_drawdown():
     """A severe-drawdown shock vector should pull GFC-era windows in."""
     curated = load_curated_analogs("models")
-    shocks = zero_shocks()
-    shocks["mkt_excess"] = -0.25
-    shocks["vix"] = 40
-    shocks["oil"] = -0.50
+    shocks = {
+        "mkt_excess": -0.25,
+        "vix": 40,
+        "oil": -0.50
+    }
     matches = find_curated_analogs(shocks, curated, k=3)
     names = {m["name"] for m in matches}
     # Lehman is the obvious analog — should be in the top 3
