@@ -1,7 +1,6 @@
 ---
 title: Financial Stress Testing
-sdk: streamlit
-sdk_version: 1.34.0
+sdk: docker
 app_file: app.py
 pinned: false
 license: mit
