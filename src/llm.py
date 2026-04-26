@@ -78,7 +78,7 @@ class Provider(ABC):
 class GeminiProvider(Provider):
     name = "gemini"
 
-    def __init__(self, model: str = "gemini-2.5-pro"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         import google.generativeai as genai
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
