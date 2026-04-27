@@ -31,6 +31,15 @@ def test_zero_shocks_equal_intercept():
     assert diff.max() < 1e-12
 
 
+def test_zero_shocks_no_intercept():
+    """With all zero shocks and no intercept, predictions should be zero."""
+    art = load_model("models")
+    pred = predict(zero_shocks(), art, use_intercept=False)
+    assert (pred["predicted_excess_return"].abs() < 1e-12).all()
+    # Intercept column should still be present
+    assert "intercept" in pred.columns
+
+
 def test_predict_shape_and_columns():
     art = load_model("models")
     pred = predict(zero_shocks(), art)

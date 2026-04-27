@@ -167,7 +167,7 @@ def _on_run() -> None:
         errors = [m for m in msgs if m.startswith("ERROR")]
         st.error("Invalid shocks: " + "; ".join(errors))
         return
-    preds = predict(ss["shocks"], _artifacts())
+    preds = predict(ss["shocks"], _artifacts(), use_intercept=False)
     ss["predictions"] = preds
     ss["summary"] = summarize_predictions(preds)
     ss["nearest"] = find_nearest_windows(ss["shocks"], _factor_history(), k=5)

@@ -12,7 +12,7 @@ inference output to avoid confusion.
 
 Public API:
     load_model(model_dir)          -> ModelArtifacts
-    predict(shocks, artifacts)     -> DataFrame (per-stock predictions)
+    predict(shocks, artifacts, use_intercept=True)     -> DataFrame (per-stock predictions)
     summarize_predictions(preds)   -> dict (UI-friendly aggregates)
 """
 from __future__ import annotations
@@ -41,9 +41,16 @@ def load_model(model_dir: str | Path = "models") -> ModelArtifacts:
 
 
 def predict(shocks: dict[str, float],
-            artifacts: ModelArtifacts) -> pd.DataFrame:
+            artifacts: ModelArtifacts,
+            use_intercept: bool = True) -> pd.DataFrame:
     """Apply shock vector to each stock's betas. Returns per-stock predictions
     with full factor attribution.
+
+    Args:
+        shocks: Dictionary of factor shocks.
+        artifacts: Loaded model artifacts.
+        use_intercept: If True (default), includes intercept in prediction.
+                       If False, excludes intercept.
 
     Returns columns:
       ticker, name, sector, predicted_excess_return,
@@ -70,8 +77,10 @@ def predict(shocks: dict[str, float],
         contribs[f"contrib_{fname}"] = beta * float(shocks[fname])
     contrib_df = pd.DataFrame(contribs)
 
-    # Predicted excess return = intercept + sum of contributions
-    pred = coef["alpha"].astype(float) + contrib_df.sum(axis=1)
+    # Predicted excess return = sum of contributions [+ intercept]
+    pred = contrib_df.sum(axis=1)
+    if use_intercept:
+        pred += coef["alpha"].astype(float)
 
     out = pd.DataFrame({
         "ticker": coef["ticker"].values,
