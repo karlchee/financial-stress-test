@@ -75,19 +75,22 @@ NTU SCTP Data Science and AI capstone project.
 .
 ├── app.py                       Streamlit entry point
 ├── src/
+│   ├── __init__.py
 │   ├── factors.py               12-factor schema (single source of truth)
 │   ├── llm.py                   LLM provider abstraction (Gemini/Anthropic/Groq)
 │   ├── model.py                 Inference: shocks -> per-stock predictions
+│   ├── retrieval.py             Retrieval and data processing utilities
 │   └── ui.py                    Streamlit UI components
 ├── prompts/
 │   └── scenario_advisor.md      LLM system prompt
 ├── scripts/
 │   └── calibrate.py             Per-stock model calibration
 ├── models/                      Calibration artifacts (committed to repo)
-│   ├── coefficients.parquet
-│   ├── stock_metadata.csv
 │   ├── analogs.json             Curated historical analogs
-│   └── calibration_report.md    Diagnostics
+│   ├── calibration_report.md    Diagnostics
+│   ├── coefficients.parquet
+│   ├── factor_history.parquet   Historical factor data
+│   └── stock_metadata.csv
 ├── tests/
 ├── .devcontainer/               Codespaces config
 └── .github/workflows/           Optional auto-deploy to HF Space
@@ -109,5 +112,4 @@ NTU SCTP Data Science and AI capstone project.
 
 ## Disclaimer
 
-Educational project. Not investment advice.
-"# financial-stress-test" 
+Educational project. Not investment advice. 
